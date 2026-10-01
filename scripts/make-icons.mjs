@@ -34,6 +34,15 @@ const chunk = (type, data) => {
 
 // Four rounded tiles on a board, inside the maskable safe zone (inner 80%).
 const TILES = [[0xee, 0xe4, 0xda], [0xf2, 0xb1, 0x79], [0xf6, 0x5e, 0x3b], rgb];
+// 5x7 pixel glyphs for N, 0, 4, 8 — one per tile. ponytail: only these four exist.
+const GLYPH = {
+  N: ['10001', '11001', '10101', '10101', '10101', '10011', '10001'],
+  0: ['01110', '10001', '10011', '10101', '11001', '10001', '01110'],
+  4: ['00010', '00110', '01010', '10010', '11111', '00010', '00010'],
+  8: ['01110', '10001', '10001', '01110', '10001', '10001', '01110'],
+};
+const LABELS = ['N', '0', '4', '8'];
+const INK = [[0x77, 0x6e, 0x65], [255, 255, 255], [255, 255, 255], [255, 255, 255]];
 const BOARD = [0xbb, 0xad, 0xa0];
 
 /** Coverage 0..1 of pixel (x, y) by a rounded rect, 1px anti-aliased edge. */
@@ -56,6 +65,8 @@ function png(size) {
       const x0 = m + gap + (i % 2) * (tw + gap), y0 = m + gap + (i >> 1) * (tw + gap);
       const a = cover(x + .5, y + .5, x0, y0, tw, tw, tw * 0.14);
       if (a) px = px.map((v, k) => v + (c[k] - v) * a);
+      const u = tw * 0.6 / 7, gx = (x + .5 - (x0 + tw / 2 - 2.5 * u)) / u, gy = (y + .5 - (y0 + tw / 2 - 3.5 * u)) / u;
+      if (a > 0.5 && GLYPH[LABELS[i]][Math.floor(gy)]?.[Math.floor(gx)] === '1') px = INK[i];
     });
     const o = y * (size * 3 + 1);
     raw[o + 1 + x * 3] = px[0]; raw[o + 2 + x * 3] = px[1]; raw[o + 3 + x * 3] = px[2];
