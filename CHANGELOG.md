@@ -2,3 +2,10 @@
 
 All notable changes to N048. Entries are generated from commit subjects
 by `npm run release`, so write commit subjects you'd be happy to read here.
+
+## [0.1.1] - 2026-10-01
+
+- fix: each base keeps its own in-progress game
+- feat: N048 — 2048 with a player-chosen base
+- init: N048 from template
+
