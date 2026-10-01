@@ -25,3 +25,7 @@ into `v * base`, so tiles are always powers of the chosen base.
 - Board cell size is computed in JS (`--cs`) from the board's real width via a
   ResizeObserver — CSS can't express "quarter of the padding box minus 3 gaps"
   cleanly, and the observer covers rotation and the mobile address bar.
+- Saves are per base: `state:<base>` in localStorage, so switching base never wipes
+  another base's game. Any new per-game setting must decide: per base or global.
+- The fraction toggle (`frac`) only relabels tiles and the goal (8 shows as 1/8) via
+  `label()`; tile values, merging and scores are untouched.
