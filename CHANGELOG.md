@@ -3,6 +3,10 @@
 All notable changes to N048. Entries are generated from commit subjects
 by `npm run release`, so write commit subjects you'd be happy to read here.
 
+## [0.2.0] - 2026-10-01
+
+- feat: fraction label toggle (8 shows as 1/8)
+
 ## [0.1.3] - 2026-10-01
 
 - feat: N 0 4 8 on the icon tiles
