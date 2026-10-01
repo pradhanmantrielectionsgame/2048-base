@@ -100,7 +100,7 @@ function end(text) {
 }
 
 function save() {
-  store.set('state', {base, score, won, over, tiles: tiles.map(({r, c, val}) => ({r, c, val}))});
+  store.set(`state:${base}`, {base, score, won, over, tiles: tiles.map(({r, c, val}) => ({r, c, val}))});
 }
 
 function reset() {
@@ -108,7 +108,7 @@ function reset() {
   tiles = []; score = 0; won = false; over = false; busy = false;
   $('#msg').classList.remove('show');
   store.set('base', base);
-  store.del('state');
+  store.del(`state:${base}`);
   const goal = (base ** WIN_EXP).toLocaleString('en-US');
   $('#goal').textContent = goal;                    // full digits, never abbreviated
   $('#goal').style.fontSize = goal.length > 12 ? '17px' : goal.length > 8 ? '21px' : '26px';
@@ -119,9 +119,10 @@ function reset() {
 
 /** Restore an interrupted game, or start a new one. */
 function restore() {
-  const s = store.get('state');
+  const old = store.get('state');                    // pre-0.1.1 single save slot
+  if (old) { store.set(`state:${old.base}`, old); store.del('state'); }
+  const s = store.get(`state:${base}`);
   if (!s || !s.tiles?.length) return reset();
-  base = s.base;
   reset();
   tiles.forEach(t => t.el?.remove());
   tiles = s.tiles.map(t => ({...t, id: ++uid, fresh: true}));
@@ -147,7 +148,7 @@ for (let b = 2; b <= 10; b++) {
   const btn = document.createElement('button');
   btn.textContent = b;
   btn.dataset.b = b;
-  btn.onclick = () => { base = b; reset(); save(); };
+  btn.onclick = () => { save(); base = b; restore(); };   // each base keeps its own game
   $('#bases').appendChild(btn);
 }
 
