@@ -42,7 +42,7 @@
   button:active{opacity:.6}
   .bases{display:flex; gap:6px}
   .bases button{flex:1; padding:9px 0; font-size:16px; border-radius:12px}
-  .bases button[aria-pressed=true]{background:var(--accent); color:#fff}
+  .bases button[aria-pressed=true], #frac[aria-pressed=true]{background:var(--accent); color:#fff}
   #board{position:relative; width:100%; aspect-ratio:1; background:var(--board);
          border-radius:16px; padding:var(--p)}
   .cell,.tile{position:absolute; width:var(--cs); height:var(--cs); border-radius:10px}
@@ -73,6 +73,7 @@
   <div id="board"><div id="msg"><div id="msgtext"></div><button id="again">Try again</button></div></div>
   <div class="row">
     <button id="new" style="flex:1">New Game</button>
+    <button id="frac" aria-label="Show tiles as fractions">⅟</button>
     <button id="share">Share</button>
     <button id="sound" aria-label="Sound">🔊</button>
   </div>

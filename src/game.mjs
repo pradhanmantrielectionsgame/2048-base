@@ -7,11 +7,14 @@ const board = $('#board');
 const store = storage('n048');
 const sfx = audio(store);
 
-let base = store.get('base', 2);
+let base = store.get('base', 2), frac = store.get('frac', false);
 let tiles = [], score = 0, uid = 0, won = false, over = false, busy = false;
 
 const fmt = n => n < 100000 ? String(n)
   : n.toLocaleString('en-US', {notation: 'compact', maximumFractionDigits: 1});
+
+/** Tile/goal label: 8 or, in fraction mode, 1/8. */
+const label = v => frac ? `1/${fmt(v)}` : fmt(v);
 
 const at = (r, c) => tiles.find(t => t.r === r && t.c === c && !t.dead);
 const grid = () => Array.from({length: SIZE}, (_, r) =>
@@ -73,12 +76,12 @@ function render() {
       board.appendChild(t.el);
     }
     const exp = Math.round(Math.log(t.val) / Math.log(base));
-    const txt = fmt(t.val);
+    const txt = label(t.val);
     t.el.textContent = txt;
     // ponytail: hue from the exponent instead of a hand-tuned palette — one line, works at every base
     t.el.style.background = exp <= 2 ? `hsl(${40 - exp * 6} 45% ${90 - exp * 6}%)` : `hsl(${(exp * 36) % 360} 65% 52%)`;
     t.el.style.color = exp <= 2 ? '#776e65' : '#fff';
-    t.el.style.fontSize = `calc(var(--cs) * ${txt.length <= 2 ? .42 : txt.length <= 4 ? .32 : .23})`;
+    t.el.style.fontSize = `calc(var(--cs) * ${txt.length <= 2 ? .42 : txt.length <= 4 ? .32 : txt.length <= 6 ? .24 : .17})`;
     t.el.style.zIndex = t.dead ? 1 : 2;
     const tr = `translate(calc((var(--cs) + var(--g)) * ${t.c}), calc((var(--cs) + var(--g)) * ${t.r}))`;
     t.el.style.setProperty('--t', tr);
@@ -103,15 +106,19 @@ function save() {
   store.set(`state:${base}`, {base, score, won, over, tiles: tiles.map(({r, c, val}) => ({r, c, val}))});
 }
 
+function setGoal() {                                 // full digits, never abbreviated
+  const n = (base ** WIN_EXP).toLocaleString('en-US'), goal = frac ? `1/${n}` : n;
+  $('#goal').textContent = goal;
+  $('#goal').style.fontSize = goal.length > 12 ? '17px' : goal.length > 8 ? '21px' : '26px';
+}
+
 function reset() {
   tiles.forEach(t => t.el?.remove());
   tiles = []; score = 0; won = false; over = false; busy = false;
   $('#msg').classList.remove('show');
   store.set('base', base);
   store.del(`state:${base}`);
-  const goal = (base ** WIN_EXP).toLocaleString('en-US');
-  $('#goal').textContent = goal;                    // full digits, never abbreviated
-  $('#goal').style.fontSize = goal.length > 12 ? '17px' : goal.length > 8 ? '21px' : '26px';
+  setGoal();
   $('#hintbase').textContent = base;
   document.querySelectorAll('#bases button').forEach(b => b.setAttribute('aria-pressed', +b.dataset.b === base));
   spawn(); spawn(); render();
@@ -155,6 +162,13 @@ for (let b = 2; b <= 10; b++) {
 onInput(board, dir => { if (dir !== 'tap') move(dir); });
 $('#new').onclick = () => { reset(); save(); };
 $('#again').onclick = () => { if (over) { reset(); save(); } else $('#msg').classList.remove('show'); };
+$('#frac').onclick = () => {                          // relabel only; tile values and rules are untouched
+  frac = !frac; store.set('frac', frac);
+  $('#frac').setAttribute('aria-pressed', frac);
+  setGoal();
+  render();
+};
+$('#frac').setAttribute('aria-pressed', frac);
 $('#sound').onclick = e => { e.target.textContent = sfx.toggle() ? '🔇' : '🔊'; };
 $('#sound').textContent = sfx.muted ? '🔇' : '🔊';
 $('#share').onclick = async () => {
