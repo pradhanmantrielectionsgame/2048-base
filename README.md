@@ -6,6 +6,13 @@ Reach `base¹¹` to win.
 
 **Play:** https://pradhanmantrielectionsgame.github.io/2048-base/
 
+## Features
+
+- **Any base:** Pick bases 2–10; difficulty stays the same, only notation changes.
+- **Per-base saves:** Each base keeps its own in-progress game. Old saves are migrated on load.
+- **Fraction labels:** Toggle to show tile values as fractions (8 → 1/8, 2048 → 1/2048). Rules unchanged.
+- **Installable PWA:** Add to Home Screen on iOS or install on Android. Works offline.
+
 ## Develop
 
 ```bash
